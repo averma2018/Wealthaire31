@@ -10,8 +10,6 @@ def create_cursor():
 
 st.image("assets/wealthaire.svg")  # Adjust your logo image path
 
-st.sidebar.markdown("👋 Wealthaire")
-
 
 if 'logged_in' in st.session_state and st.session_state.logged_in:
     st.write("Welcome Back!")
