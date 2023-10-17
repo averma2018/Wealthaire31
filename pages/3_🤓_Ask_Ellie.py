@@ -1,13 +1,36 @@
 import pandas as pd
 import openai
 import streamlit as st
-from classes import get_primer,format_question,run_request
+from classes import get_primer, format_question, run_request
 import warnings
+
 warnings.filterwarnings("ignore")
 st.set_option('deprecation.showPyplotGlobalUse', False)
-st.set_page_config(page_icon="chat2vis.png",layout="wide",page_title="Chat2VIS")
+st.set_page_config(page_icon="chat2vis.png", layout="wide", page_title="Chat2VIS")
 
-# ... [skipping the UI design code and model selection for brevity] ...
+st.markdown("<h1 style='text-align: center; font-weight:bold; font-family:comic sans ms; padding-top: 0rem;'> \
+            Chat2VIS</h1>", unsafe_allow_html=True)
+st.markdown("<h2 style='text-align: center;padding-top: 0rem;'>Creating Visualisations using Natural Language \
+            with ChatGPT and Code Llama</h2>", unsafe_allow_html=True)
+
+#st.sidebar.write(":clap: :red[*Code Llama model coming soon....*]")
+st.sidebar.markdown('<a style="text-align: center;padding-top: 0rem;" href="mailto: i.build.apps.4.u@gmail.com">:email:</a> Paula Maddigan and Teo Susnjak', unsafe_allow_html=True)
+st.sidebar.markdown("<h4  style='text-align: center;font-size:small;color:grey;padding-top: 0rem;padding-bottom: .2rem;'>Chat2VIS: Generating Data \
+                    Visualisations via Natural Language using ChatGPT, Codex and GPT-3 \
+                 Large Language Models </h4>", unsafe_allow_html=True)
+
+st.sidebar.caption("(https://doi.org/10.1109/ACCESS.2023.3274199)")
+                 
+st.sidebar.markdown("<h4  style='text-align:center;font-size:small;color:grey;padding-top: 0rem;padding-bottom: .2rem;'>Chat2VIS: Fine-Tuning Data Visualisations using Multilingual \
+Natural Language Text and Pre-Trained Large Language Models </h4>", unsafe_allow_html=True)
+
+st.sidebar.caption("(https://doi.org/10.48550/arXiv.2303.14292)")
+
+st.sidebar.markdown('<a style="text-align: center;padding-top: 0rem;" href="https://blog.streamlit.io/chat2vis-ai-driven-visualisations-with-streamlit-and-natural-language">Blog </a> by Paula Maddigan', unsafe_allow_html=True)
+
+
+available_models = {"ChatGPT-4": "gpt-4","ChatGPT-3.5": "gpt-3.5-turbo","GPT-3": "text-davinci-003",
+                        "GPT-3.5 Instruct": "gpt-3.5-turbo-instruct","Code Llama":"CodeLlama-34b-Instruct-hf"}
 
 # Create an empty dictionary for uploaded datasets
 datasets = {}
@@ -32,6 +55,9 @@ with st.sidebar:
 
     # ... [rest of the code remains unchanged] ...
 
+available_models = {"ChatGPT-4": "gpt-4","ChatGPT-3.5": "gpt-3.5-turbo","GPT-3": "text-davinci-003",
+                     "GPT-3.5 Instruct": "gpt-3.5-turbo-instruct","Code Llama":"CodeLlama-34b-Instruct-hf"}
+with st.sidebar:
     # Check boxes for model choice
     st.write(":brain: Choose your model(s):")
     # Keep a dictionary of whether models are selected or not
@@ -100,17 +126,6 @@ if go_btn and model_count > 0:
                     else:
                         st.error("Unfortunately the code generated from the model contained errors and was unable to execute.")
 
-# Display the datasets in a list of tabs
-# Create the tabs
-tab_list = st.tabs(datasets.keys())
-
-# Load up each tab with a dataset
-for dataset_num, tab in enumerate(tab_list):
-    with tab:
-        # Can't get the name of the tab! Can't index key list. So convert to list and index
-        dataset_name = list(datasets.keys())[dataset_num]
-        st.subheader(dataset_name)
-        st.dataframe(datasets[dataset_name],hide_index=True)
 
 # Insert footer to reference dataset origin  
 footer="""<style>.footer {position: fixed;left: 0;bottom: 0;width: 100%;text-align: center;}</style><div class="footer">
