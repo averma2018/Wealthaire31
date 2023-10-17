@@ -10,7 +10,7 @@ warnings.filterwarnings("ignore")
 st.set_option('deprecation.showPyplotGlobalUse', False)
 st.set_page_config(page_icon="chat2vis.png", layout="wide", page_title="Chat2VIS")
 
-st.markdown("<h1 style='text-align: center; font-weight:bold; font-family:comic sans ms; padding-top: 0rem;'> \
+st.markdown("<h1 style='text-align: center; font-weight:bold; font-family:poppins; padding-top: 0rem;'> \
             Chat2VIS</h1>", unsafe_allow_html=True)
 st.markdown("<h2 style='text-align: center;padding-top: 0rem;'>Creating Visualisations using Natural Language \
             with ChatGPT and Code Llama</h2>", unsafe_allow_html=True)
