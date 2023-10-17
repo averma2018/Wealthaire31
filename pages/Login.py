@@ -1,7 +1,7 @@
 import streamlit as st
 import hashlib
 import sqlite3
-from streamlit_config import apply_custom_styles
+from config import apply_custom_styles
 apply_custom_styles()
 
 def create_cursor():
