@@ -39,21 +39,7 @@ st.sidebar.markdown('<a style="text-align: center;padding-top: 0rem;" href="http
 available_models = {"ChatGPT-4": "gpt-4","ChatGPT-3.5": "gpt-3.5-turbo","GPT-3": "text-davinci-003",
                         "GPT-3.5 Instruct": "gpt-3.5-turbo-instruct","Code Llama":"CodeLlama-34b-Instruct-hf"}
 
-# List to hold datasets
-if "datasets" not in st.session_state:
-    datasets = {}
-    # Preload datasets
-    datasets["Movies"] = pd.read_csv("movies.csv")
-    datasets["Housing"] =pd.read_csv("housing.csv")
-    datasets["Cars"] =pd.read_csv("cars.csv")
-    datasets["Colleges"] =pd.read_csv("colleges.csv")
-    datasets["Customers & Products"] =pd.read_csv("customers_and_products_contacts.csv")
-    datasets["Department Store"] =pd.read_csv("department_store.csv")
-    datasets["Energy Production"] =pd.read_csv("energy_production.csv")
-    st.session_state["datasets"] = datasets
-else:
-    # use the list already loaded
-    datasets = st.session_state["datasets"]
+
 
 key_col1,key_col2 = st.columns(2)
 openai_key = key_col1.text_input(label = ":key: OpenAI Key:", help="Required for ChatGPT-4, ChatGPT-3.5, GPT-3, GPT-3.5 Instruct.",type="password")
