@@ -20,3 +20,12 @@ if 'logged_in' in st.session_state and st.session_state.logged_in:
     if st.sidebar.button("Sign out"):
         st.session_state.logged_in = False
         st.write("Logged out successfully. See you next time!")
+
+hide_st_style = """
+            <style>
+            #MainMenu {visibility: hidden;}
+            footer {visibility: hidden;}
+            header {visibility: hidden;}
+            </style>
+            """
+st.markdown(hide_st_style, unsafe_allow_html=True)
