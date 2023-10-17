@@ -1,5 +1,8 @@
 import streamlit as st
 import sqlite3
+from streamlit_config import apply_custom_styles
+apply_custom_styles()
+
 
 def create_cursor():
     conn = sqlite3.connect('data.db')
@@ -21,11 +24,3 @@ if 'logged_in' in st.session_state and st.session_state.logged_in:
         st.session_state.logged_in = False
         st.write("Logged out successfully. See you next time!")
 
-hide_st_style = """
-            <style>
-            #MainMenu {visibility: hidden;}
-            footer {visibility: hidden;}
-            header {visibility: hidden;}
-            </style>
-            """
-st.markdown(hide_st_style, unsafe_allow_html=True)
