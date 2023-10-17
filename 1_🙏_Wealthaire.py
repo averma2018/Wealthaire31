@@ -8,7 +8,7 @@ def create_cursor():
     conn = sqlite3.connect('data.db')
     return conn.cursor()
 
-st.image("wealthaire logo.svg")  # Adjust your logo image path
+st.image("/assets/hero.png")  # Adjust your logo image path
 
 
 if 'logged_in' in st.session_state and st.session_state.logged_in:
