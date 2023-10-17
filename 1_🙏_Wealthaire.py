@@ -1,4 +1,7 @@
 import streamlit as st
+import sys
+sys.path.append('/Users/ankitverma/Documents/GitHub/wealthaire/pages/classes.py')
+
 import sqlite3
 from config import apply_custom_styles
 apply_custom_styles()

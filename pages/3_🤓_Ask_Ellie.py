@@ -1,4 +1,6 @@
 import pandas as pd
+import sys
+sys.path.append('/Users/ankitverma/Documents/GitHub/wealthaire/pages/classes.py')
 import openai
 import streamlit as st
 from classes import get_primer, format_question, run_request
