@@ -17,8 +17,7 @@ st.markdown("<h2 style='text-align: center;padding-top: 0rem;'>Creating Visualis
 
 #st.sidebar.write(":clap: :red[*Code Llama model coming soon....*]")
 st.sidebar.markdown('<a style="text-align: center;padding-top: 0rem;" href="mailto: averma2018@gmail.com">:email:</a> Feedback', unsafe_allow_html=True)
-st.sidebar.markdown("<h4  style='text-align: center;font-size:small;color:grey;padding-top: 0rem;padding-bottom: .2rem;'>Ask Ellie anything about your finances \
-                 Large Language Models </h4>", unsafe_allow_html=True)
+st.sidebar.markdown("<h4  style='text-align: center;font-size:small;color:grey;padding-top: 0rem;padding-bottom: .2rem;'>Ask Ellie anything about your finances>", unsafe_allow_html=True)
 
 
                  
