@@ -2,7 +2,7 @@ import streamlit as st
 import hashlib
 import sqlite3
 import re
-from streamlit_config import apply_custom_styles
+from config import apply_custom_styles
 apply_custom_styles()
 
 conn = sqlite3.connect('data.db')
