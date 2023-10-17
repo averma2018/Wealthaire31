@@ -8,7 +8,12 @@ def create_cursor():
     conn = sqlite3.connect('data.db')
     return conn.cursor()
 
-st.image("assets/hero.png")  # Adjust your logo image path
+st.write("""
+    <div style="text-align: center;">
+        <img src="assets/hero.png" />
+    </div>
+    """, unsafe_allow_html=True)
+
 
 
 if 'logged_in' in st.session_state and st.session_state.logged_in:
