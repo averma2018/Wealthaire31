@@ -1,6 +1,8 @@
 import streamlit as st
 import sqlite3
 from config import apply_custom_styles
+import warnings
+
 apply_custom_styles()
 
 

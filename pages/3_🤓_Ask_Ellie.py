@@ -1,137 +1,79 @@
 import pandas as pd
-import sys
-sys.path.append('/Users/ankitverma/Documents/GitHub/wealthaire/pages/classes.py')
 import openai
 import streamlit as st
-from classes import get_primer, format_question, run_request
 import warnings
 
-warnings.filterwarnings("ignore")
-st.set_option('deprecation.showPyplotGlobalUse', False)
-st.set_page_config(page_icon="chat2vis.png", layout="wide", page_title="Chat2VIS")
+from classes import get_primer, format_question, run_request
 
-st.markdown("<h1 style='text-align: center; font-weight:bold; font-family:poppins; padding-top: 0rem;'> \
-            Chat2VIS</h1>", unsafe_allow_html=True)
-st.markdown("<h2 style='text-align: center;padding-top: 0rem;'>Creating Visualisations using Natural Language \
-            with ChatGPT and Code Llama</h2>", unsafe_allow_html=True)
+# Set up page config
+st.set_page_config(page_icon="chat2vis.png", layout="wide", page_title="Ask Ellie")
 
-#st.sidebar.write(":clap: :red[*Code Llama model coming soon....*]")
-st.sidebar.markdown('<a style="text-align: center;padding-top: 0rem;" href="mailto: averma2018@gmail.com">:email:</a> Feedback', unsafe_allow_html=True)
-st.sidebar.markdown("<h4  style='text-align: center;font-size:small;color:grey;padding-top: 0rem;padding-bottom: .2rem;'>Ask Ellie anything about your finances", unsafe_allow_html=True)
+st.title("💬 Ask Ellie - Your Personal Finance AI")
+st.caption("🚀 Powered by OpenAI and Streamlit")
 
-
-key_col1,key_col2 = st.columns(2)
-openai_key = key_col1.text_input(label = ":key: OpenAI Key:", help="Required for ChatGPT-4, ChatGPT-3.5, GPT-3, GPT-3.5 Instruct.",type="password")
-hf_key = key_col2.text_input(label = ":hugging_face: HuggingFace Key:",help="Required for Code Llama", type="password")                 
-
-available_models = {"ChatGPT-4": "gpt-4","ChatGPT-3.5": "gpt-3.5-turbo","GPT-3": "text-davinci-003",
-                        "GPT-3.5 Instruct": "gpt-3.5-turbo-instruct","Code Llama":"CodeLlama-34b-Instruct-hf"}
-
-# Create an empty dictionary for uploaded datasets
-datasets = {}
-
+# Sidebar for user credentials and CSV upload
 with st.sidebar:
-    # Add facility to upload a dataset
-    try:
-        uploaded_file = st.file_uploader(":computer: Load a CSV file:", type="csv")
-        index_no = 0
-        if uploaded_file:
-            # Read in the data, add it to the list of available datasets. Give it a nice name.
-            file_name = uploaded_file.name[:-4].capitalize()
-            datasets[file_name] = pd.read_csv(uploaded_file)
-            index_no = len(datasets) - 1
-    except Exception as e:
-        st.error("File failed to load. Please select a valid CSV file.")
-        print("File failed to load.\n" + str(e))
+    openai_api_key = st.text_input("OpenAI API Key", key="openai_api_key", type="password")
 
-    if datasets:
-        # Radio buttons for dataset choice
-        chosen_dataset = st.radio(":bar_chart: Choose your data:", list(datasets.keys()), index=index_no)
+uploaded_file = st.file_uploader("Upload your financial CSV data:", type="csv")
 
-    # ... [rest of the code remains unchanged] ...
+# Check if the uploaded file is valid
+if uploaded_file:
+    financial_data = pd.read_csv(uploaded_file)
+    st.session_state["financial_data"] = financial_data
+    st.write("Financial data uploaded successfully!")
+else:
+    st.write("Upload your financial data to get insights from Ellie!")
+    financial_data = None
 
-available_models = {"ChatGPT-4": "gpt-4","ChatGPT-3.5": "gpt-3.5-turbo","GPT-3": "text-davinci-003",
-                     "GPT-3.5 Instruct": "gpt-3.5-turbo-instruct","Code Llama":"CodeLlama-34b-Instruct-hf"}
-with st.sidebar:
-    # Check boxes for model choice
-    st.write(":brain: Choose your model(s):")
-    # Keep a dictionary of whether models are selected or not
-    use_model = {}
-    for model_desc,model_name in available_models.items():
-        label = f"{model_desc} ({model_name})"
-        key = f"key_{model_desc}"
-        use_model[model_desc] = st.checkbox(label,value=True,key=key)
- 
- # Text area for query
-question = st.text_area(":eyes: What would you like to visualise?",height=10)
-go_btn = st.button("Go...")
+if financial_data is not None:
+    st.write("Generating primers for the financial data...")
+    primers = get_primer(financial_data.copy())
+    
+    if primers is None:
+        st.error("Unable to generate primers for the provided financial data.")
+        st.stop()
+    else:
+        primer_desc, primer_code = primers
+        
+        st.write("Primers generated successfully.")
 
-# Make a list of the models which have been selected
-selected_models = [model_name for model_name, choose_model in use_model.items() if choose_model]
-model_count = len(selected_models)
+    # Greet the user with the primer description
+    if "messages" not in st.session_state:
+        st.session_state["messages"] = [{"role": "assistant", "content": f"Hi! I've noticed your data has the following structure: {primer_desc}. How can I assist you?"}]
+else:
+    primer_desc, primer_code = None, None
 
-# Execute chatbot query
-if go_btn and model_count > 0:
-    api_keys_entered = True
-    # Check API keys are entered.
-    if  "ChatGPT-4" in selected_models or "ChatGPT-3.5" in selected_models or "GPT-3" in selected_models or "GPT-3.5 Instruct" in selected_models:
-        if not openai_key.startswith('sk-'):
-            st.error("Please enter a valid OpenAI API key.")
-            api_keys_entered = False
-    if "Code Llama" in selected_models:
-        if not hf_key.startswith('hf_'):
-            st.error("Please enter a valid HuggingFace API key.")
-            api_keys_entered = False
-    if api_keys_entered:
-        # Place for plots depending on how many models
-        plots = st.columns(model_count)
-        # Get the primer for this dataset
-        primer1,primer2 = get_primer(datasets[chosen_dataset],'datasets["'+ chosen_dataset + '"]') 
-        # Create model, run the request and print the results
-        for plot_num, model_type in enumerate(selected_models):
-            with plots[plot_num]:
-                st.subheader(model_type)
-                try:
-                    # Format the question 
-                    question_to_ask = format_question(primer1, primer2, question, model_type)   
-                    # Run the question
-                    answer=""
-                    answer = run_request(question_to_ask, available_models[model_type], key=openai_key,alt_key=hf_key)
-                    # the answer is the completed Python script so add to the beginning of the script to it.
-                    answer = primer2 + answer
-                    print("Model: " + model_type)
-                    print(answer)
-                    plot_area = st.empty()
-                    plot_area.pyplot(exec(answer))           
-                except Exception as e:
-                    if type(e) == openai.error.APIError:
-                        st.error("OpenAI API Error. Please try again a short time later. (" + str(e) + ")")
-                    elif type(e) == openai.error.Timeout:
-                        st.error("OpenAI API Error. Your request timed out. Please try again a short time later. (" + str(e) + ")")
-                    elif type(e) == openai.error.RateLimitError:
-                        st.error("OpenAI API Error. You have exceeded your assigned rate limit. (" + str(e) + ")")
-                    elif type(e) == openai.error.APIConnectionError:
-                        st.error("OpenAI API Error. Error connecting to services. Please check your network/proxy/firewall settings. (" + str(e) + ")")
-                    elif type(e) == openai.error.InvalidRequestError:
-                        st.error("OpenAI API Error. Your request was malformed or missing required parameters. (" + str(e) + ")")
-                    elif type(e) == openai.error.AuthenticationError:
-                        st.error("Please enter a valid OpenAI API Key. (" + str(e) + ")")
-                    elif type(e) == openai.error.ServiceUnavailableError:
-                        st.error("OpenAI Service is currently unavailable. Please try again a short time later. (" + str(e) + ")")               
-                    else:
-                        st.error("Unfortunately the code generated from the model contained errors and was unable to execute.")
+# Add a dropdown menu to the sidebar for the user to select a model
+model = st.sidebar.selectbox("OpenAI Model", ["gpt-3.5-turbo", "gpt-4", "text-davinci-003", "code-davinci-002", "code-davinci-003"])
 
+if prompt := st.chat_input():
+    if not openai_api_key:
+        st.info("Please add your OpenAI API key to continue.")
+        st.stop()
 
-# Insert footer to reference dataset origin  
-footer="""<style>.footer {position: fixed;left: 0;bottom: 0;width: 100%;text-align: center;}</style><div class="footer">
-<p> <a style='display: block; text-align: center;'> Datasets courtesy of NL4DV, nvBench and ADVISor </a></p></div>"""
-st.caption("Datasets courtesy of NL4DV, nvBench and ADVISor")
+    if primer_desc is None or primer_code is None:
+        st.error("Please upload your financial data before asking questions.")
+        st.stop()
 
-# Hide menu and footer
-hide_streamlit_style = """
-            <style>
-            #MainMenu {visibility: hidden;}
-            footer {visibility: hidden;}
-            </style>
-            """
-st.markdown(hide_streamlit_style, unsafe_allow_html=True)
+    formatted_question = format_question(primer_desc, primer_code, prompt, model_type=model)
+
+    visualization_code = run_request(formatted_question, model, openai_api_key)
+
+    if "visualize" in prompt and "data" in prompt:
+        st.write("Here's a visualization of your data...")
+        try:
+            exec(visualization_code)
+        except Exception as e:
+            warnings.warn(f"An error occurred: {e}")
+        st.session_state["messages"].append({"role": "assistant", "content": "I've visualized your financial data above."})
+    else:
+        openai.api_key = openai_api_key
+        st.session_state.messages.append({"role": "user", "content": prompt})
+        st.chat_message("user").write(prompt)
+        response = openai.ChatCompletion.create(
+            model=model, messages=st.session_state.messages
+        )
+        msg = response.choices[0].message
+        st.session_state.messages.append(msg)
+        st.chat_message("assistant").write(msg.content)
